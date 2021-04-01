@@ -9,6 +9,6 @@ return [
             "headers" => 'Origin,Authorization,Content-Type,Accept',
             "maxAge" => 3600
         ],
-        'url_udalost'=> 'http://api.udalost.web'
+        'url_udalost'=> 'http://api.udalost.web',
     ],
 ];

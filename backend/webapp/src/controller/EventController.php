@@ -277,7 +277,6 @@ class EventController {
   }
 
   public function joinEvent(Request $rq, Response $rs,array $args): Response {
-        
         try{
             $id = $args['id'];
 
@@ -287,44 +286,12 @@ class EventController {
 
               //Enregistrer le header Authorization
               $h = $rq->getHeader('Authorization')[0];
-
               //Decodage du token
               $tokenstring= sscanf($h, "Bearer %s")[0];
               $token;
-
               $token = JWT::decode($tokenstring, $secret, ['HS512']);
 
             }
-              // } catch(SignatureInvalidException $se){
-                //Nous traitons les erreurs
-                // $rs = $rs->withStatus(401)
-                // ->withHeader('Content-Type','application/json')->withHeader('WWW-authenticate');
-                // $rs->getBody()->write(
-                //     json_encode(
-                //         array(
-                //             'type' => 'error',
-                //             'error' => 401,
-                //             'message' => 'Token invalide'
-                //         )
-                //     )
-                // );
-                // return $rs;
-              // }
-            
-            // else {
-            //   $rs = $rs->withStatus(401)
-            //       ->withHeader('Content-Type','application/json')->withHeader('WWW-authenticate');
-            //       $rs->getBody()->write(
-            //           json_encode(
-            //               array(
-            //                   'type' => 'error',
-            //                   'error' => 401,
-            //                   'message' => 'No authorization header present'
-            //               )
-            //           )
-            //       );
-            //       return $rs;
-            // }
 
             $json_data = $rq->getParsedBody();
 
@@ -342,7 +309,7 @@ class EventController {
             // L'ID de l'utilisateur qu'on récupère grâce au token
             if (isset($token)) {
                 $participant->id_utilisateur = $token->cid;
-                $participant->nom = null;
+                $participant->nom = $nom;
             }
             else {
               $participant->id_utilisateur = null;
@@ -472,6 +439,7 @@ class EventController {
     try{
         $id = $args['id'];
 
+
         $json_data = $rq->getParsedBody();
 
         $c = new Client(["base_uri" => $this->c->settings['url_udalost']]);
@@ -479,6 +447,8 @@ class EventController {
         $texte = $json_data["texte"];
         $lien = $json_data["lien"];
 
+        $participant = Participant::select()->where('id', '=', $id_participant)->get();
+        $evenement = Evenement::select()->where('id', '=', $id)->get();
 
         $getBody = json_decode($rq->getBody());
 
@@ -493,8 +463,14 @@ class EventController {
         
         $uri = $rq->getUri();
         $baseUrl = $uri->getBaseUrl();
+
+        $data = [
+          'participant'=>$participant,
+          'commentaires'=>$commentaire->toArray(),
+          'evenement'=>$evenement->toArray()
+        ];
         
-        return Writer::json_output($rs, 201, ['commentaires'=>$commentaire->toArray()])
+        return Writer::json_output($rs, 201, $data)
             ->withHeader('Location', $baseUrl.$this->c['router']->pathFor('evenement', ['id'=>$id]));
 
     //Nous traitons les erreurs

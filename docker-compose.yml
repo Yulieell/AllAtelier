@@ -78,10 +78,23 @@ services:
     ports:
       - "10380:80"
     volumes:
-      - ./frontend/public:/usr/local/apache2/htdocs
+      - ./frontend/dist:/usr/local/apache2/htdocs
     working_dir: /usr/local/apache2/htdocs
     networks:
       - udalost.net
+
+  #webfront:
+  #  image: httpd:latest
+  #  environment:
+  #    - http_proxy=http://www-cache.iutnc.univ-lorraine.fr:3128
+  #    - https_proxy=http://www-cache.iutnc.univ-lorraine.fr:3128
+  #  ports:
+  #    - "19280:80"
+  #  volumes:
+  #    - ./front/public:/usr/local/apache2/htdocs
+  #  working_dir: /usr/local/apache2/htdocs
+  #  networks:
+  #    - d.net
 
   #############################
   # mysql + phpmyadmin
